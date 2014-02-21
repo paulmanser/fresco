@@ -1,7 +1,7 @@
 empiricalControlQA <-
 function(object, newControlSet=FALSE, sdCutoff = .1){
 
-  if (!is(object, "RGChannelSet")) stop("'object' needs to be a 'RGChannelSet'")
+  if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
   # pull out control probes and get average --------------------------------------
   betaVals <- getBeta(object)
