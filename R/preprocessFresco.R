@@ -2,7 +2,6 @@ preprocessFresco <-
 function(object, useControls = TRUE, useFilteredControls = FALSE,
                              verbose = TRUE, loessSpan = .1, fitLoess = TRUE){  
   
-  require("minfi")
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
   # create object for methylated and unmethylated channels -------------------------

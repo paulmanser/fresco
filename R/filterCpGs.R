@@ -2,7 +2,6 @@ filterCpGs <-
 function(object, filterCrossHyb = TRUE, filterSNP = TRUE, 
                        minorAlleleFreq = 0, population = 'All'){
   
-  require("minfi")
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
   populationAF <- c('All', 'African', 'American', 'Asian', 'European')
