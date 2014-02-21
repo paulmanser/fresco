@@ -12,7 +12,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
   GC <- frescoData$targetGC
   
-  log2Centered <- apply(log2(signals + 1), c(1, 3), mean)
+  log2Centered <- apply(log2(signals + 1), c(1, 3), mean, trim = .1)
   
   typeI <- which(frescoData$probeType == 'I')
   typeII <- which(frescoData$probeType == 'II')
