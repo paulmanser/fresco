@@ -1,6 +1,5 @@
-filterCpGs <-
-function(object, filterCrossHyb = TRUE, filterSNP = TRUE, 
-                       minorAlleleFreq = 0, population = 'All'){
+filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE, 
+                       filterSNP = TRUE, minorAlleleFreq = 0, population = 'All'){
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
@@ -11,17 +10,21 @@ function(object, filterCrossHyb = TRUE, filterSNP = TRUE,
   frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
   methSignals <- getMeth(object)
   unmethSignals <- getUnmeth(object)
-    
+  
+  if (length(removeSexChr) > 0){
+    removeProbes <- c(removeProbes, probeIDs[which(frescoData$chromosome %in% removeChr)])
+  }
+  
   if (filterCrossHyb){
-    removeProbes <- c(removeProbes, rownames(frescoData)[which(frescoData$crossHyb)])
+    removeProbes <- c(removeProbes, probeIDs[which(frescoData$crossHyb)])
   }
   
   if (filterSNP){
     AFtype <- match(population, populationAF) + 4
     SNPind <- which(frescoData[,AFtype] > minorAlleleFreq)
-    removeProbes <- c(removeProbes, rownames(frescoData)[SNPind])
+    removeProbes <- c(removeProbes, probeIDs[SNPind])
   }
-  
+    
   removeProbes <- unique(removeProbes)
   
   keepCpGs <- setdiff(probeIDs, removeProbes)
