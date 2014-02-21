@@ -1,0 +1,16 @@
+Package: fresco
+Title: Flexible local regression using empirically selected control probes
+Description: A R package for the preprocessing of the Illumina Human
+    Methylation 450k Bead Array.  Includes functions for implementing fresco,
+    a normalization method using loess regression to model and correct for
+    technical artifacts.  Also includes functions to filter probes containing
+    known SNPs and probes that cross-hybridize to sex chromosomes.
+Version: 0.1
+Author: Paul Manser <manserpt@vcu.edu>
+Maintainer: Paul Manser <manserpt@vcu.edu>
+License: GPL-2
+Depends:
+    R (>= 2.15.3),
+    stats,
+    methods
+    minfi
