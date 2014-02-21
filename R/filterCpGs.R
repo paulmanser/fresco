@@ -1,5 +1,6 @@
 filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE, 
-                       filterSNP = TRUE, minorAlleleFreq = 0, population = 'All'){
+                       filterNA = TRUE, filterSNP = TRUE, 
+                       minorAlleleFreq = 0, population = 'All'){
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
@@ -11,12 +12,17 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
   methSignals <- getMeth(object)
   unmethSignals <- getUnmeth(object)
   
-  if (length(removeSexChr) > 0){
+  if (length(removeSexChromosomes) > 0){
     removeProbes <- c(removeProbes, probeIDs[which(frescoData$chromosome %in% removeChr)])
   }
   
   if (filterCrossHyb){
     removeProbes <- c(removeProbes, probeIDs[which(frescoData$crossHyb)])
+  }
+  
+  if (filterNA){
+    NAind <- probeIDs[which(rowSums(is.na(getBeta(object))) > 0)]
+    removeProbes <- c(removeProbes, probeIDs[NAind])
   }
   
   if (filterSNP){
