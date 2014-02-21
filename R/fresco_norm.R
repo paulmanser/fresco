@@ -1,3 +1,4 @@
+#' @export
 
 preprocessFresco <- function(object, useControls = TRUE, useFilteredControls = FALSE,
                              verbose = TRUE, loessSpan = .1, fitLoess = TRUE){  

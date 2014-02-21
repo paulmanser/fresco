@@ -1,3 +1,4 @@
+#' @export
 
 empiricalControlQA <- function(object, newControlSet=FALSE, sdCutoff = .1){
 
