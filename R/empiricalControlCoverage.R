@@ -25,8 +25,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   
   # type I probes M & UM
   smoothScatter(log2Centered[typeI, 2:1], xlab = 'log2(Methylated Signal)',
-                ylab = 'log2(Unmethylated Signal)',
-                xlim = c(7, 15), ylim = c(7, 15))
+                ylab = 'log2(Unmethylated Signal)')
   
   points(log2Centered[intersect(methEC, typeI), 2:1], 
          pch = 16, cex = controlCex, col = 'red')
@@ -40,7 +39,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   # type I probes M & GC
   smoothScatter(log2Centered[typeI, 2], GC[typeI],
                 xlab = 'log2(Methylated Signal)',
-                ylab = 'Target GC Content', xlim = c(7, 15),
+                ylab = 'Target GC Content',
                 main = 'Type I Probes')
   
   points(log2Centered[intersect(methEC,typeI), 2],
@@ -57,7 +56,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   
   # type I UM & GC
   smoothScatter(log2Centered[typeI, 1], GC[typeI],
-                xlab = 'log2(Unmethylated Signal)',xlim = c(7, 15),
+                xlab = 'log2(Unmethylated Signal)',
                 ylab = 'Target GC Content')
   
   points(log2Centered[intersect(methEC, typeI), 1], 
@@ -74,8 +73,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   
   # type II probes M & UM
   smoothScatter(log2Centered[typeII, 2:1], xlab = 'log2(Methylated Signal)',
-                ylab = 'log2(Unmethylated Signal)',
-                xlim = c(7, 15), ylim = c(7, 15))
+                ylab = 'log2(Unmethylated Signal)')
   
   points(log2Centered[intersect(methEC,typeII), 2:1], 
          pch = 16, cex = controlCex, col = 'red')
@@ -88,7 +86,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   
   # type II M & GC
   smoothScatter(log2Centered[typeII, 2], GC[typeII],
-                xlab = 'log2(Methylated Signal)',xlim = c(7, 15),
+                xlab = 'log2(Methylated Signal)',
                 ylab = 'Target GC Content',
                 main = 'Type II Probes')
   
@@ -106,7 +104,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   
   # type II UM & GC
   smoothScatter(log2Centered[typeII, 1], GC[typeII],
-                xlab = 'log2(Unmethylated Signal)', xlim = c(7, 15),
+                xlab = 'log2(Unmethylated Signal)', 
                 ylab = 'Target GC Content')
   
   points(log2Centered[intersect(methEC, typeII), 1], 
