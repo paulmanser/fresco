@@ -23,8 +23,8 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
   }
   
   # divide probes and controls up by probe type ------------------------------------
-  whichSetII <- which(frescoData$probeType=='II')
-  whichSetI <- which(frescoData$probeType=='I') 
+  whichSetII <- which(frescoData$probeType == 'II')
+  whichSetI <- which(frescoData$probeType == 'I') 
   
   if (useControls){ 
     whichControlsII <- intersect(whichSetII, controls)
