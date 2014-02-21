@@ -1,5 +1,5 @@
-#' @export
-filterCpGs <- function(object, filterCrossHyb = TRUE, filterSNP = TRUE, 
+filterCpGs <-
+function(object, filterCrossHyb = TRUE, filterSNP = TRUE, 
                        minorAlleleFreq = 0, population = 'All'){
   
   require("minfi")

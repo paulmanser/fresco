@@ -1,5 +1,5 @@
-#' @export
-preprocessFresco <- function(object, useControls = TRUE, useFilteredControls = FALSE,
+preprocessFresco <-
+function(object, useControls = TRUE, useFilteredControls = FALSE,
                              verbose = TRUE, loessSpan = .1, fitLoess = TRUE){  
   
   require("minfi")
@@ -230,8 +230,3 @@ preprocessFresco <- function(object, useControls = TRUE, useFilteredControls = F
   
   out
 }
-  
-  
-  
-  
-  

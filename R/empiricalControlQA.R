@@ -1,5 +1,5 @@
-#' @export
-empiricalControlQA <- function(object, newControlSet=FALSE, sdCutoff = .1){
+empiricalControlQA <-
+function(object, newControlSet=FALSE, sdCutoff = .1){
 
   require(minfi)
   if (!is(object, "RGChannelSet")) stop("'object' needs to be a 'RGChannelSet'")
