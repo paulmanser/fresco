@@ -10,7 +10,7 @@
 
 
 preprocessFresco <-function(object, useControls = TRUE, loessSpan = .1, 
-                            fitLoess = TRUE, sdThreshold = .1){  
+                            fitLoess = TRUE, sdThreshold = .1, verbose = TRUE){  
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
@@ -97,6 +97,7 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .1,
   # compute robust experiment average ---------------------------------------------
   if (verbose) cat('Computing robust experiment-wise average\n')
   log2Centered <- log2(scaledSignals + 1)  
+  
   sexInd <- factor(suppressWarnings(getSex(mapToGenome(object))[, 3]))
   XYind <- which(frescoData$chromosome %in% c('X', 'Y'))
   log2Standard <- apply(log2Centered, c(1, 3), mean, trim = .1)
