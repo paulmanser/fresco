@@ -1,12 +1,12 @@
 #' Visualization of empirical control coverage across technical covariates
 #' 
 #' @param object \code{MethylSet} object
-#' @param sdCutoff Standard deviation cut-off for filtering empirical controls
+#' @param sdThreshold Standard deviation cut-off for filtering empirical controls
 #' 
 #' @export empiricalControlCoverage
 
 
-empiricalControlCoverage <- function(object, sdCutoff = .1){
+empiricalControlCoverage <- function(object, sdThreshold = .1){
 
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
