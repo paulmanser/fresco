@@ -7,7 +7,8 @@ filterCpGs(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
   population = "All")
 }
 \arguments{
-  \item{object}{\code{MethylSet} object}
+  \item{object}{\code{MethylSet} or \code{GenomicRatioSet}
+  object}
 
   \item{removeChromosomes}{A character string of chromoses
   to remove}
