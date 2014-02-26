@@ -1,7 +1,16 @@
-empiricalControlQA <-
-function(object, newControlSet=FALSE, sdCutoff = .1){
+#' Quality assessment and filtering threshold selection for empirical controls
+#' 
+#' @param object \code{MethylSet} object
+#' @param sdCutoff Standard deviation cut-off for filtering empirical controls
+#' 
+#' @export empiricalControlQA
+
+
+empiricalControlQA <- function(object, sdCutoff = .1){
 
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
+  
+  data(frescoData)
   
   # pull out control probes and get average --------------------------------------
   betaVals <- getBeta(object)
@@ -11,6 +20,7 @@ function(object, newControlSet=FALSE, sdCutoff = .1){
   means <- rowMeans(betaVals[controlInd,])  
   
   # plot sorted control probes as heat map -------------------------------------
+  par(mfrow = c(1, 3))
   image(betaVals[controlInd[order(means)], ], axes = FALSE,
         main = 'Empirical Control Probe QC',
         xlab = 'CpGs ordered by avg methylation',
@@ -23,26 +33,17 @@ function(object, newControlSet=FALSE, sdCutoff = .1){
   
   plot(density(controlsSD), main = 'Empirical Control Probe Standard Deviations',
        xlab='Standard Deviation')
+    
+  abline(v=sdCutoff)
+  legend('right', legend = paste(sum(controlsSD < sdCutoff), 'of', 
+                                 length(controlInd), 'controls remaining'), bty = 'n')
   
-  if (newControlSet){
-    
-    abline(v=sdCutoff)
-    legend('right', legend = paste(sum(controlsSD < sdCutoff), 'of', 
-                                   length(controlInd), 'controls remaining'), bty = 'n')
-    
-    image(betaVals[controlInd[order(means)], ][which(controlsSD < sdCutoff), ], 
-          axes=FALSE,
-          main='Filtered Empirical Control Probes',
-          xlab='CpGs ordered by avg methylation',
-          ylab='Samples')
-    
-    lines(seq(0, 1, length.out = length(which(controlsSD < sdCutoff))), 
-          means[order(means)][which(controlsSD < sdCutoff)], col = 1)
-
-    discardControls <- names(controlsSD[controlsSD > sdCutoff])
-    frescoData$eControlsFiltered <- frescoData$eControls
-    frescoData$eControlsFiltered[rownames(frescoData) %in% discardControls] <- NA
-    return(frescoData)
-
-  }
+  image(betaVals[controlInd[order(means)], ][which(controlsSD < sdCutoff), ], 
+        axes=FALSE,
+        main='Filtered Empirical Control Probes',
+        xlab='CpGs ordered by avg methylation',
+        ylab='Samples')
+  
+  lines(seq(0, 1, length.out = length(which(controlsSD < sdCutoff))), 
+        means[order(means)][which(controlsSD < sdCutoff)], col = 1)
 }
