@@ -8,18 +8,29 @@
 #' @param minorAlleleFreq What is the largest minor allele frequency we are willing to tolerate?
 #' @param population What population should be used to compute minor allele frequency?
 #' Default is 'All'
-
+#' 
+#' @export filterCpGs
 
 filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE, 
                        filterNA = TRUE, filterSNP = TRUE, 
                        minorAlleleFreq = 0, population = 'All'){
   
-  # allow for object to be methylset, RGchannelset, or GenomicRatioSet
+  
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
   populationAF <- c('All', 'African', 'American', 'Asian', 'European')
-  removeProbes <- NULL
   
+  if (!population %in% populationAF){
+    stop("population' must be one of 'All', 'African', 'American', 'Asian', or 'European'")
+  }
+  
+  if (sum(!removeChromosomes %in% c('X', 'Y', 1:22)) > 0){
+    stop("'removeChromosomes' needs to be a list of
+         chromosomes to remove e.g. c('X', '1')")
+  }
+  
+  data(frescoData)
+  removeProbes <- NULL
   probeIDs <- rownames(getMeth(object))
   frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
   methSignals <- getMeth(object)
@@ -40,7 +51,7 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
   
   if (filterSNP){
     AFtype <- match(population, populationAF) + 4
-    SNPind <- which(frescoData[,AFtype] > minorAlleleFreq)
+    SNPind <- which(frescoData[, AFtype] > minorAlleleFreq)
     removeProbes <- c(removeProbes, probeIDs[SNPind])
   }
     
