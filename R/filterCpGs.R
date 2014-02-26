@@ -1,6 +1,6 @@
 #' Filter unreliable probes 
 #' 
-#' @param object \code{MethylSet} object
+#' @param object \code{MethylSet} or \code{GenomicRatioSet} object
 #' @param removeChromosomes A character string of chromoses to remove
 #' @param filterCrossHyb Filter autosomal probes that cross-hybridize to sex chromosomes?
 #' @param filterNA Filter probes containing at least one NA?
@@ -15,11 +15,11 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
                        filterNA = TRUE, filterSNP = TRUE, 
                        minorAlleleFreq = 0, population = 'All'){
   
-  
-  if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
+  if (sum(!class(object) %in% c("MethylSet", "GenomicRatioSet")) > 0){
+    stop("'object' needs to be a 'MethylSet' or 'GenomicRatioSet'")
+  } 
   
   populationAF <- c('All', 'African', 'American', 'Asian', 'European')
-  
   if (!population %in% populationAF){
     stop("population' must be one of 'All', 'African', 'American', 'Asian', or 'European'")
   }
@@ -30,12 +30,13 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
   }
   
   data(frescoData)
-  removeProbes <- NULL
-  probeIDs <- rownames(getMeth(object))
-  frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
-  methSignals <- getMeth(object)
-  unmethSignals <- getUnmeth(object)
   
+  removeProbes <- NULL
+  if (is(object, 'MethylSet')) probeIDs <- rownames(getMeth(object))
+  if (is(object, 'GenomicRatioSet')) probeIDs <- rownames(getBeta(object))
+  
+  frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
+    
   if (length(removeChromosomes) > 0){
     removeProbes <- c(removeProbes, probeIDs[which(frescoData$chromosome %in% removeChromosomes)])
   }
@@ -56,15 +57,29 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
   }
     
   removeProbes <- unique(removeProbes)
-  
   keepCpGs <- setdiff(probeIDs, removeProbes)
   
   out <- object
-  methSignals <- methSignals[keepCpGs, ]
-  unmethSignals <- methSignals[keepCpGs, ]
-  assayDataElement(out, 'Unmeth') <- unmethSignals
-  assayDataElement(out, 'Meth') <- methSignals
   
-  out  
+  if(is(object, 'MethylSet')){
+    assayDataElement(out, 'Unmeth') <- getUnmeth(object)[keepCpGs, ]
+    assayDataElement(out, 'Meth') <- getMeth(object)[keepCpGs, ]
+    return(out)
+  }
+  
+  if(is(object, 'GenomicRatioSet')){
+
+    out <- GenomicRatioSet(gr = granges(object)[keepCpGs], Beta = NULL, 
+                           M = getM(object)[keepCpGs],
+                           CN = getCN(object)[keepCpGs],
+                           pData = pData(object),
+                           annotation = annotation(object),
+                           preprocessMethod = preprocessMethod)
+
+    return(out)
+  }
   
 }
+
+
+
