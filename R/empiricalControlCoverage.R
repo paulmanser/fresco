@@ -25,7 +25,7 @@ empiricalControlCoverage <- function(object, sdThreshold = .1){
   
   # filter controls and create indicator variables --------------------------
   probeSD <- apply(getBeta(object), 1, sd)
-  frescoData$eControls[probeSD < sdThreshold] <- NA
+  frescoData$eControls[probeSD > sdThreshold] <- NA
   typeI <- which(frescoData$probeType == 'I')
   typeII <- which(frescoData$probeType == 'II')
   hemEC <- which(frescoData$eControls == 'Hemimethylated')
