@@ -33,7 +33,7 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
   
   removeProbes <- NULL
   if (is(object, 'MethylSet')) probeIDs <- rownames(getMeth(object))
-  if (is(object, 'GenomicRatioSet')) probeIDs <- rownames(getBeta(object))
+  if (is(object, 'GenomicRatioSet')) probeIDs <- rownames(getM(object))
   
   frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
     
@@ -58,24 +58,24 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
     
   removeProbes <- unique(removeProbes)
   keepCpGs <- setdiff(probeIDs, removeProbes)
-  
-  out <- object
-  
+    
   if(is(object, 'MethylSet')){
-    assayDataElement(out, 'Unmeth') <- getUnmeth(object)[keepCpGs, ]
-    assayDataElement(out, 'Meth') <- getMeth(object)[keepCpGs, ]
+    out <- object
+    getUnmeth(object) <- getUnmeth(object)[keepCpGs, ]
+    getMeth(object) <- getMeth(object)[keepCpGs, ]
     return(out)
   }
   
   if(is(object, 'GenomicRatioSet')){
-
-    out <- GenomicRatioSet(gr = granges(object)[keepCpGs], Beta = NULL, 
-                           M = getM(object)[keepCpGs],
-                           CN = getCN(object)[keepCpGs],
+    
+    out <- GenomicRatioSet(gr = rowData(object)[keepCpGs],
+                           Beta = NULL, 
+                           M = getM(object)[keepCpGs, ],
+                           CN = getCN(object[keepCpGs, ]),
                            pData = pData(object),
                            annotation = annotation(object),
-                           preprocessMethod = preprocessMethod)
-
+                           preprocessMethod = preprocessMethod(object)) 
+      
     return(out)
   }
   
