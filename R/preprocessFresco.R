@@ -1,8 +1,21 @@
-preprocessFresco <-
-function(object, useControls = TRUE, useFilteredControls = FALSE,
-                             verbose = TRUE, loessSpan = .1, fitLoess = TRUE){  
+#' Normalize data using flexible local regression using empirical controls
+#' 
+#' @param object \code{MethylSet} object
+#' @param useControls Should empirical controls be used to align and fit loess surfaces?
+#' @param loessSpan Supply span for fitting loess surface
+#' @param fitLoess Should loess curve be fitted after initial alignment and scaling?
+#' @param sdThreshold Threshold to filter empirical controls by standard deviation
+#' 
+#' @export preprocessFresco
+
+
+preprocessFresco <-function(object, useControls = TRUE, loessSpan = .1, 
+                            fitLoess = TRUE, sdThreshold = .1){  
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
+  if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
+  
+  data(frescoData)
   
   # create object for methylated and unmethylated channels -------------------------
   methTmp <- getMeth(object)
@@ -14,13 +27,11 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
   GC <- frescoData$targetGC
   
   # get set of empirical controls --------------------------------------------------
-  if (useControls & !useFilteredControls){
-    controls <- which(!is.na(frescoData$eControls))
+  if (useControls){
+    probeSD <- apply(getBeta(object), 1, sd)
+    controls <- which(!is.na(frescoData$eControls) & probeSD < sdThreshold)
     if (verbose) cat(length(controls), 'empirical control probes detected\n')
-  } else if (useControls & useFilteredControls){
-    controls <- which(!is.na(frescoData$eControlsFiltered))
-    if (verbose) cat(length(controls), 'empirical control probes detected\n')
-  }
+  } 
   
   # divide probes and controls up by probe type ------------------------------------
   whichSetII <- which(frescoData$probeType == 'II')
@@ -34,17 +45,8 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
     whichControlsI <- whichSetI
   }
   
-  # declare peak finding function -------------------------------------------------
-  if (verbose) cat('Aligning signal intensities \n')
-  
-  getLowerPeak <- function(x){
-    intensityDensity <- density(x)
-    peaksInd <- which(diff(sign(diff(intensityDensity$y)))==-2)+1
-    lowerPeak <- which.min(intensityDensity$x[peaksInd])
-    return(intensityDensity$x[peaksInd[lowerPeak]])
-  }
-  
   # find lower peaks ---------------------------------------------------------------
+  if (verbose) cat('Aligning signal intensities \n')
   typeIpeaks <- apply(signals[whichControlsI, , ], c(2, 3), getLowerPeak)
   typeIIpeaks <- apply(signals[whichControlsII, , ], c(2, 3), getLowerPeak)
   typeIpeakMeans <- colMeans(typeIpeaks)
@@ -66,7 +68,7 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
   coefsII1 <- lm(signals[whichControlsII, , 1] ~ typeIIcontrolAvg[, 1] + 0)$coef
   coefsII2 <- lm(signals[whichControlsII, , 2] ~ typeIIcontrolAvg[, 2] + 0)$coef
   
-  scaledSignals <- array(dim=dim(signals))
+  scaledSignals <- array(dim = dim(signals))
   scaledSignals[whichSetI, , 1] <- sweep(signals[whichSetI, , 1], 2, coefsI1, '/') + typeIpeakMeans[1]
   scaledSignals[whichSetI, , 2] <- sweep(signals[whichSetI, , 2], 2, coefsI2, '/') + typeIpeakMeans[2]
   scaledSignals[whichSetII, , 1] <-sweep(signals[whichSetII, , 1], 2, coefsII1, '/') + typeIIpeakMeans[1]
@@ -77,7 +79,7 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
   if (!fitLoess){
     out <- object
     normedUnmeth <- scaledSignals[, , 1]
-    normedMeth <- scaledSignalslog2NormedSignals[, , 2]
+    normedMeth <- scaledSignals[, , 2]
     rownames(normedUnmeth) <- rownames(normedMeth) <- probeIDs
     colnames(normedUnmeth) <- colnames(normedMeth) <- colnames(methTmp)
     
@@ -111,6 +113,7 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
   # compute deviations from average -----------------------------------------  
   if (verbose) cat('Computing deviations from average \n')
   log2Deviations <- array(dim = dim(log2Centered))
+  
   for(kk in 1:2) 
     log2Deviations[, , kk] <- log2Centered[, , kk] - log2Standard[, kk]
   
@@ -121,17 +124,13 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
     }
   }  
   
-  # winsorize by probe type -------------------------------------------------
+  # winsorize by probe type ----------------------------------------------------------
   if (useControls){
     if (verbose) cat('Winsorizing probes out of prediction range \n')
-    winsorizeBySubset <- function(x, whichSet, whichControls){
-      x[whichSet][which(x[whichSet] > max(x[whichControls]))] <- max(x[whichControls])
-      x[whichSet][which(x[whichSet] < min(x[whichControls]))] <- min(x[whichControls])
-      x[whichSet]
-    }
     
     GC[whichSetI] <- winsorizeBySubset(GC, whichSetI, whichControlsI)
     GC[whichSetII] <- winsorizeBySubset(GC, whichSetII, whichControlsII)
+    
     for (kk in 1:2){
       log2Standard[whichSetI, kk] <- winsorizeBySubset(log2Standard[, kk], whichSetI, whichControlsI)  
       log2Standard[whichSetII, kk] <- winsorizeBySubset(log2Standard[, kk], whichSetII, whichControlsII)  
@@ -140,32 +139,25 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
   
   # create independent variable data frame for loess ---------------------------------
   indepVars <- data.frame(GC = GC, UMavg = log2Standard[, 1], Mavg = log2Standard[, 2])
+  
   if(nlevels(sexInd) == 2){
     indepVarsM <- data.frame(GC = GC, UMavg = log2StandardM[, 1], Mavg = log2StandardM[, 2])
     indepVarsF <- data.frame(GC = GC, UMavg = log2StandardF[, 1], Mavg = log2StandardF[, 2])
   }
-    
-  # declare loess function -----------------------------------------------------------
-  funLoess <- function(y, indepVars, whichControls, whichSet, smoothingParameter) {
-    modelDat <- as.data.frame(cbind(y, indepVars))
-    tempFit <- loess(y ~ GC * Mavg * UMavg, trace.hat = 'approx', 
-                     span = smoothingParameter, 
-                     modelDat, subset = whichControls)
-    resids <- y[whichSet] - predict(tempFit, modelDat[whichSet, ])
-    return(resids)
-  }
-  
+      
   # fit loess surfaces ----------------------------------------------------------------  
   if (verbose) cat('Fitting & subtracting out loess\n')
   
   if (nlevels(sexInd) == 1){
     if (verbose) cat('Normalizing type I probes \n')
-    typeInormed <- apply(log2Deviations, c(2, 3), funLoess, indepVars = indepVars, 
-                         whichControls = whichControlsI, whichSet = whichSetI, smoothingParameter = loessSpan)
+    typeInormed <- apply(log2Deviations, c(2, 3), funLoess, 
+                         indepVars = indepVars, whichControls = whichControlsI,
+                         whichSet = whichSetI, smoothingParameter = loessSpan)
     
     if (verbose) cat('Normalizing type II probes \n')
-    typeIInormed <- apply(log2Deviations, c(2, 3), funLoess, indepVars = indepVars, 
-                          whichControls = whichControlsII, whichSet = whichSetII, smoothingParameter = loessSpan)
+    typeIInormed <- apply(log2Deviations, c(2, 3), funLoess, 
+                          indepVars = indepVars, whichControls = whichControlsII, 
+                          whichSet = whichSetII, smoothingParameter = loessSpan)
     
     # recombine into log2NormedDevs
     log2NormedDevs <- array(dim = dim(log2Deviations))
@@ -176,20 +168,24 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
   if (nlevels(sexInd) == 2){
     if (verbose) cat('Normalizing type I probes \n')
     # type I
-    typeInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess, indepVars = indepVarsM, 
-                          whichControls = whichControlsI, whichSet = whichSetI, smoothingParameter = loessSpan)
+    typeInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess,
+                          indepVars = indepVarsM, whichControls = whichControlsI, 
+                          whichSet = whichSetI, smoothingParameter = loessSpan)
     
-    typeInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, indepVars = indepVarsF, 
-                          whichControls = whichControlsI, whichSet = whichSetI, smoothingParameter = loessSpan)
+    typeInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
+                          indepVars = indepVarsF, whichControls = whichControlsI, 
+                          whichSet = whichSetI, smoothingParameter = loessSpan)
     
     # type II
     if (verbose) cat('Normalizing type II probes \n')
-    typeIInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess, indepVars = indepVarsM, 
-                           whichControls = whichControlsII, whichSet = whichSetII, smoothingParameter = loessSpan)
+    typeIInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess, 
+                           indepVars = indepVarsM, whichControls = whichControlsII, 
+                           whichSet = whichSetII, smoothingParameter = loessSpan)
     
     cat('Normalizing type II probes \n')
-    typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, indepVars = indepVarsF, 
-                           whichControls = whichControlsII, whichSet = whichSetII, smoothingParameter = loessSpan)
+    typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
+                           indepVars = indepVarsF, whichControls = whichControlsII, 
+                           whichSet = whichSetII, smoothingParameter = loessSpan)
     
     # recombine into log2NormedDevs
     log2NormedDevs <- array(dim = dim(log2Deviations))
@@ -228,4 +224,32 @@ function(object, useControls = TRUE, useFilteredControls = FALSE,
                             manifest = as.character(packageVersion('IlluminaHumanMethylation450kmanifest')))
   
   out
+}
+
+
+# declare peak finding function -------------------------------------------------
+
+getLowerPeak <- function(x){
+  intensityDensity <- density(x)
+  peaksInd <- which(diff(sign(diff(intensityDensity$y)))==-2)+1
+  lowerPeak <- which.min(intensityDensity$x[peaksInd])
+  return(intensityDensity$x[peaksInd[lowerPeak]])
+}
+
+# declare winsorization function ------------------------------------------
+
+winsorizeBySubset <- function(x, whichSet, whichControls){
+  x[whichSet][which(x[whichSet] > max(x[whichControls]))] <- max(x[whichControls])
+  x[whichSet][which(x[whichSet] < min(x[whichControls]))] <- min(x[whichControls])
+  x[whichSet]
+}
+
+# declare loess function -----------------------------------------------------------
+funLoess <- function(y, indepVars, whichControls, whichSet, smoothingParameter) {
+  modelDat <- as.data.frame(cbind(y, indepVars))
+  tempFit <- loess(y ~ GC * Mavg * UMavg, trace.hat = 'approx', 
+                   span = smoothingParameter, 
+                   modelDat, subset = whichControls)
+  resids <- y[whichSet] - predict(tempFit, modelDat[whichSet, ])
+  return(resids)
 }
