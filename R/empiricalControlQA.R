@@ -1,12 +1,12 @@
 #' Quality assessment and filtering threshold selection for empirical controls
 #' 
 #' @param object \code{MethylSet} object
-#' @param sdCutoff Standard deviation cut-off for filtering empirical controls
+#' @param sdThreshold Standard deviation cut-off for filtering empirical controls
 #' 
 #' @export empiricalControlQA
 
 
-empiricalControlQA <- function(object, sdCutoff = .1){
+empiricalControlQA <- function(object, sdThreshold = .1){
 
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
@@ -34,16 +34,16 @@ empiricalControlQA <- function(object, sdCutoff = .1){
   plot(density(controlsSD), main = 'Empirical Control Probe Standard Deviations',
        xlab='Standard Deviation')
     
-  abline(v=sdCutoff)
-  legend('right', legend = paste(sum(controlsSD < sdCutoff), 'of', 
+  abline(v=sdThreshold)
+  legend('right', legend = paste(sum(controlsSD < sdThreshold), 'of', 
                                  length(controlInd), 'controls remaining'), bty = 'n')
   
-  image(betaVals[controlInd[order(means)], ][which(controlsSD < sdCutoff), ], 
+  image(betaVals[controlInd[order(means)], ][which(controlsSD < sdThreshold), ], 
         axes=FALSE,
         main='Filtered Empirical Control Probes',
         xlab='CpGs ordered by avg methylation',
         ylab='Samples')
   
-  lines(seq(0, 1, length.out = length(which(controlsSD < sdCutoff))), 
-        means[order(means)][which(controlsSD < sdCutoff)], col = 1)
+  lines(seq(0, 1, length.out = length(which(controlsSD < sdThreshold))), 
+        means[order(means)][which(controlsSD < sdThreshold)], col = 1)
 }
