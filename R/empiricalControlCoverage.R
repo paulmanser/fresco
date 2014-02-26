@@ -1,8 +1,17 @@
+#' Visualization of empirical control coverage across technical covariates
+#' 
+#' @param object \code{MethylSet} object
+#' @param sdCutoff Standard deviation cut-off for filtering empirical controls
+#' 
+#' @export empiricalControlCoverage
 
-empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
+
+empiricalControlCoverage <- function(object, sdCutoff = .1){
 
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
-
+  
+  data(frescoData)
+  
   # create object for methylated and unmethylated channels ------------------
   methTmp <- getMeth(object)
   probeIDs <- rownames(methTmp)
@@ -14,6 +23,9 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   
   log2Centered <- apply(log2(signals + 1), c(1, 3), mean, trim = .1)
   
+  # filter controls and create indicator variables --------------------------
+  probeSD <- apply(getBeta(object), 1, sd)
+  frescoData$eControls[probeSD < sdThreshold] <- NA
   typeI <- which(frescoData$probeType == 'I')
   typeII <- which(frescoData$probeType == 'II')
   hemEC <- which(frescoData$eControls == 'Hemimethylated')
@@ -21,7 +33,7 @@ empiricalControlCoverage <- function(object, useFilteredControls = FALSE){
   umethEC <- which(frescoData$eControls == 'Unmethylated')
   
   par(mfrow = c(2, 3))
-  controlCex <- .5
+  controlCex <- .7
   
   # type I probes M & UM
   smoothScatter(log2Centered[typeI, 2:1], xlab = 'log2(Methylated Signal)',
