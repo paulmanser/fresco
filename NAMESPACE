@@ -1,1 +1,5 @@
-exportPattern("^[[:alpha:]]+")
+export(empiricalControlCoverage)
+export(empiricalControlQA)
+export(filterCpGs)
+export(plotFitStats)
+export(preprocessFresco)
