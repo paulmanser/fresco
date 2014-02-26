@@ -3,7 +3,7 @@
 \title{Normalize data using flexible local regression using empirical controls}
 \usage{
 preprocessFresco(object, useControls = TRUE, loessSpan = 0.1,
-  fitLoess = TRUE, sdThreshold = 0.1)
+  fitLoess = TRUE, sdThreshold = 0.1, verbose = TRUE)
 }
 \arguments{
   \item{object}{\code{MethylSet} object}
