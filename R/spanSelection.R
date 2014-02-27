@@ -5,7 +5,8 @@
 #' @param loessSpan Supply span for fitting loess surface
 #' @param sdThreshold Threshold to filter empirical controls by standard deviation
 
-returnFitStats <-function(object, useControls = TRUE, loessSpan = .1, sdThreshold = .1){  
+returnFitStats <-function(object, useControls = TRUE, loessSpan = .1, 
+                          sdThreshold = .1, verbose = FALSE){  
   
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
   
@@ -153,12 +154,12 @@ returnFitStats <-function(object, useControls = TRUE, loessSpan = .1, sdThreshol
                            indepVars = indepVarsM, whichControls = whichControlsII, 
                            whichSet = whichSetII, smoothingParameter = loessSpan)
     
-    cat('Normalizing type II probes \n')
     typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
                            indepVars = indepVarsF, whichControls = whichControlsII, 
                            whichSet = whichSetII, smoothingParameter = loessSpan)
     
     typeInormed <- typeIInormed <- array(dim = c(3, dim(log2Deviations)[2], 2))
+    browser()
     typeInormed[, mInd, ] <- typeInormedM
     typeInormed[, fInd, ] <- typeInormedF
     typeIInormed[, mInd, ] <- typeIInormedM
