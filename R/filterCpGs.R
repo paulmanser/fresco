@@ -61,8 +61,8 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
     
   if(is(object, 'MethylSet')){
     out <- object
-    getUnmeth(object) <- getUnmeth(object)[keepCpGs, ]
-    getMeth(object) <- getMeth(object)[keepCpGs, ]
+    assayDataElement(out, 'Unmeth') <- getUnmeth(object)[keepCpGs, ]
+    assayDataElement(out, 'Meth') <- getMeth(object)[keepCpGs, ]
     return(out)
   }
   
