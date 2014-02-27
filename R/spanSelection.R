@@ -140,21 +140,21 @@ returnFitStats <-function(object, useControls = TRUE, loessSpan = .1,
   if (nlevels(sexInd) == 2){
     if (verbose) cat('Normalizing type I probes \n')
     # type I
-    typeInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess,
+    typeInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoessSS,
                           indepVars = indepVarsM, whichControls = whichControlsI, 
                           whichSet = whichSetI, smoothingParameter = loessSpan)
     
-    typeInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
+    typeInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoessSS, 
                           indepVars = indepVarsF, whichControls = whichControlsI, 
                           whichSet = whichSetI, smoothingParameter = loessSpan)
     
     # type II
     if (verbose) cat('Normalizing type II probes \n')
-    typeIInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess, 
+    typeIInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoessSS, 
                            indepVars = indepVarsM, whichControls = whichControlsII, 
                            whichSet = whichSetII, smoothingParameter = loessSpan)
     
-    typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
+    typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoessSS, 
                            indepVars = indepVarsF, whichControls = whichControlsII, 
                            whichSet = whichSetII, smoothingParameter = loessSpan)
     
