@@ -3,40 +3,21 @@
 \alias{fresco}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+fresco: preprocessing and normalization for illumina 450k methylation array
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
-}
-\details{
-\tabular{ll}{
-Package: \tab fresco\cr
-Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2014-02-21\cr
-License: \tab What license is it under?\cr
-}
- An overview of how to use the package, including the 
- most important functions 
+fresco provides functions for normalizing data using a flexible local regression
+surface that is robust to abberant DNA methylation as well as differences in cell
+type admixtures.  It also provides functions for quality control of empirical control
+probes as well as filtering for CpGs that contain SNPs or autosomal probes that cross hybridize to sex chromosomes.
 }
 \author{
-Paul Manser
+Paul Manser \email{manserpt@vcu.edu}
+Mark Reimers \email{mreimers@vcu.edu}
 
-Maintainer: Paul Manser <manserpt@vcu.edu>
-~~ The author and/or maintainer of the package ~~
+Maintainer: Paul Manser \email{manserpt@vcu.edu}
 }
 \references{
-~~ Literature or other references for background information ~~
+Chen, Y., Lemire, M., Choufani, S., Butcher, D. T., Grafodatskaya, D., Zanke, B. W., … Weksberg, R. (2013). Discovery of cross-reactive probes and polymorphic CpGs in the Illumina Infinium HumanMethylation450 microarray. Epigenetics: official journal of the DNA Methylation Society, 8(2), 203–9. doi:10.4161/epi.23470
 }
-~~ Optionally other standard keywords, one per line, ~~
-~~ from file KEYWORDS in the R documentation directory ~~
-\keyword{ package }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
-}
+
