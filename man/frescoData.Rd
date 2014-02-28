@@ -2,12 +2,12 @@
 \alias{frescoData}
 \docType{data}
 \title{
-Data for use with preprocessFresco
+Data for use with fresco package
 }
 \description{
-An index of empirical control probes used for loess surface fitting.
+Contains an index of empirical control probes used for loess surface fitting.
 Contains information on minor allele frenquencies for probes containing SNPS as
-well as probes known to cross-hybridize to sex chromosomes.
+well as that cross-hybridize to probes on sex chromosomes obtained from Chen et al.
 }
 \usage{data(frescoData)}
 \format{
@@ -26,16 +26,16 @@ well as probes known to cross-hybridize to sex chromosomes.
   }
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+frescoData is called from within the fresco functions, but a separate copy can be
+loaded into the global environment if desired.
 }
 \source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+Chen, Y., Lemire, M., Choufani, S., Butcher, D. T., Grafodatskaya, D., Zanke, B. W., … Weksberg, R. (2013). Discovery of cross-reactive probes and polymorphic CpGs in the Illumina Infinium HumanMethylation450 microarray. Epigenetics: official journal of the DNA Methylation Society, 8(2), 203–9. doi:10.4161/epi.23470
+
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
+
 }
 \examples{
-data(frescoData)
-## maybe str(frescoData) ; plot(frescoData) ...
 }
 \keyword{datasets}
