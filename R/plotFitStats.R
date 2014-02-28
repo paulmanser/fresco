@@ -21,7 +21,7 @@ plotFitStats <- function(object, useControls = TRUE,
   for(ii in 1:length(loessSpan)){
     fitstats[[ii]] <- returnFitStats(object, useControls = useControls, 
                                      loessSpan = loessSpan[ii], sdThreshold = sdThreshold)
-    cat(ii, 'of', length(sParm), '\n\n')
+    cat(ii, 'of', length(loessSpan), '\n\n')
   }
   
   pdf('fresco-fit-stats.pdf')
