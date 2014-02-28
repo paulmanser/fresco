@@ -1,4 +1,4 @@
 fresco
 ======
 
-A R package for preprocessing Illumina 450k methylation array
+A R package for normalization and preprocessing of Illumina 450k methylation array
