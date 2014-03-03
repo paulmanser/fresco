@@ -18,6 +18,6 @@ Mark Reimers \email{mreimers@vcu.edu}
 Maintainer: Paul Manser \email{manserpt@vcu.edu}
 }
 \references{
-Chen, Y., Lemire, M., Choufani, S., Butcher, D. T., Grafodatskaya, D., Zanke, B. W., … Weksberg, R. (2013). Discovery of cross-reactive probes and polymorphic CpGs in the Illumina Infinium HumanMethylation450 microarray. Epigenetics: official journal of the DNA Methylation Society, 8(2), 203–9. doi:10.4161/epi.23470
+Chen,Y. et al. (2013) Discovery of cross-reactive probes and polymorphic CpGs in the Illumina Infinium HumanMethylation450 microarray. Epigenetics, 8, 203–9.
 }
 
