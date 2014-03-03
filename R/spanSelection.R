@@ -159,7 +159,6 @@ returnFitStats <-function(object, useControls = TRUE, loessSpan = .1,
                            whichSet = whichSetII, smoothingParameter = loessSpan)
     
     typeInormed <- typeIInormed <- array(dim = c(3, dim(log2Deviations)[2], 2))
-    browser()
     typeInormed[, mInd, ] <- typeInormedM
     typeInormed[, fInd, ] <- typeInormedF
     typeIInormed[, mInd, ] <- typeIInormedM
