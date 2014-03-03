@@ -36,7 +36,7 @@ plotFitStats <- function(object, useControls = TRUE,
       
       gcvCurves <- NULL
       for(ii in 1:length(fitstats))
-        gcvCurves <- cbind(gcvCurves, fitstats[[ii]][[probeType]][2, , channelType])
+        gcvCurves <- cbind(gcvCurves, fitstats[[ii]][[probeType]][thisStat, , channelType])
       
       matplot(loessSpan, t(gcvCurves), type='l', 
               main = paste('Type ', probeType, ' : ',
