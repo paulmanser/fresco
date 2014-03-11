@@ -29,20 +29,21 @@ empiricalControlQA <- function(object, sdThreshold = .1){
         means[order(means)], col = 1)
   
   # plot control probe standard deviations --------------------------------------
-  controlsSD <- apply(betaVals[controlInd[order(means)], ], 1, sd)
+  controlsSD <- rowSds(betaVals[controlInd[order(means)])
   
-  plot(density(controlsSD), main = 'Empirical Control Probe Standard Deviations',
+  plot(density(controlsSD), 
+       main = 'Empirical Control Probe Standard Deviations',
        xlab='Standard Deviation')
     
-  abline(v=sdThreshold)
+  abline(v = sdThreshold)
   legend('right', legend = paste(sum(controlsSD < sdThreshold), 'of', 
                                  length(controlInd), 'controls remaining'), bty = 'n')
   
   image(betaVals[controlInd[order(means)], ][which(controlsSD < sdThreshold), ], 
-        axes=FALSE,
-        main='Filtered Empirical Control Probes',
-        xlab='CpGs ordered by avg methylation',
-        ylab='Samples')
+        axes = FALSE,
+        main = 'Filtered Empirical Control Probes',
+        xlab = 'CpGs ordered by avg methylation',
+        ylab = 'Samples')
   
   lines(seq(0, 1, length.out = length(which(controlsSD < sdThreshold))), 
         means[order(means)][which(controlsSD < sdThreshold)], col = 1)
