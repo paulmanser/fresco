@@ -60,8 +60,8 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .1,
   
   # scale signals to minimize deviance from control averages -----------------------
   if (verbose) cat('Applying linear scaling factor \n')
-  typeIcontrolAvg <- apply(signals[whichControlsI, , ], c(1, 3), mean, trim = .1)
-  typeIIcontrolAvg <- apply(signals[whichControlsII, , ], c(1, 3), mean, trim = .1)
+  typeIcontrolAvg <- apply(signals[whichControlsI, , ], c(1, 3), mean)
+  typeIIcontrolAvg <- apply(signals[whichControlsII, , ], c(1, 3), mean)
   
   coefsI1 <- lm(signals[whichControlsI, , 1] ~ typeIcontrolAvg[, 1] + 0)$coef
   coefsI2 <- lm(signals[whichControlsI, , 2] ~ typeIcontrolAvg[, 2] + 0)$coef
@@ -183,7 +183,6 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .1,
                            indepVars = indepVarsM, whichControls = whichControlsII, 
                            whichSet = whichSetII, smoothingParameter = loessSpan)
     
-    cat('Normalizing type II probes \n')
     typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
                            indepVars = indepVarsF, whichControls = whichControlsII, 
                            whichSet = whichSetII, smoothingParameter = loessSpan)
