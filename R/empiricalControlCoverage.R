@@ -6,7 +6,7 @@
 #' @export empiricalControlCoverage
 
 
-empiricalControlCoverage <- function(object, sdThreshold = .1){
+empiricalControlCoverage <- function(object, sdThreshold = .15){
 
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   

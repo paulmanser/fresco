@@ -9,8 +9,8 @@
 #' @export preprocessFresco
 
 
-preprocessFresco <-function(object, useControls = TRUE, loessSpan = .1, 
-                            fitLoess = TRUE, sdThreshold = .1, verbose = TRUE){  
+preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15, 
+                            fitLoess = TRUE, sdThreshold = .15, verbose = TRUE){  
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")

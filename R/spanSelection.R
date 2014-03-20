@@ -5,8 +5,8 @@
 #' @param loessSpan Supply span for fitting loess surface
 #' @param sdThreshold Threshold to filter empirical controls by standard deviation
 
-returnFitStats <-function(object, useControls = TRUE, loessSpan = .1, 
-                          sdThreshold = .1, verbose = FALSE){  
+returnFitStats <-function(object, useControls = TRUE, loessSpan = .15, 
+                          sdThreshold = .15, verbose = FALSE){  
   
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
   

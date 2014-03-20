@@ -9,7 +9,7 @@
 
 
 plotFitStats <- function(object, useControls = TRUE, 
-                         loessSpan = seq(.05, .95, .15), sdThreshold = .1){
+                         loessSpan = seq(.05, .95, .15), sdThreshold = .15){
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
