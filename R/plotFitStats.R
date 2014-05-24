@@ -24,7 +24,6 @@ plotFitStats <- function(object, useControls = TRUE,
     cat(ii, 'of', length(loessSpan), '\n\n')
   }
   
-  pdf('fresco-fit-stats.pdf')
   par(mfrow = c(2,2))
   
   # generate gcv curves -----------------------------------------------------
