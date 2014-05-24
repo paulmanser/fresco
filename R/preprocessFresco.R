@@ -17,6 +17,8 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   
   data(frescoData)
   
+  object <- fixMethOutliers(object)
+  
   # create object for methylated and unmethylated channels -------------------------
   methTmp <- getMeth(object)
   probeIDs <- rownames(methTmp)
