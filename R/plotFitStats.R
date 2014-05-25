@@ -45,5 +45,5 @@ plotFitStats <- function(object, useControls = TRUE,
       }
     }
   }  
-  dev.off()
+
 }
