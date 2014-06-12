@@ -77,7 +77,7 @@ horseRace <- function(object, batchVarName = NULL,
 }
 
 .batchTest <- function(x) rowFtests(getBeta(x), factor(pData(x)[, batchVarName]))
-.catTest <- function(x) rowFtests(getBeta(x), factor(pData(x)[, factor(covariateNames[ii]])))
+.catTest <- function(x) rowFtests(getBeta(x), factor(pData(x)[, factor(covariateNames[ii])]))
 .contTest <- function(x){
   cont.cov <- pData(x)[, covariateNames[ii]]
   apply(getBeta(x), 1, function(z) biglm(z ~ cont.cov))
