@@ -15,5 +15,6 @@ Depends:
     matrixStats,
     methods,
     minfi,
+    genefilter,
     IlluminaHumanMethylation450kmanifest,
     IlluminaHumanMethylation450kanno.ilmn12.hg19
