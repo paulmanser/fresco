@@ -17,13 +17,13 @@ horseRace <- function(object, batchVarName = NULL,
   
   # normalize ---------------------------------------------------------
   normList <- list()
-  normList$rawMSet <- preprocessIllumina(updateObject(object))
+  normList$rawMSet  <- preprocessIllumina(updateObject(object))
   normList$fresco15 <- preprocessFresco(normList, loessSpan = .15, sdThreshold = .15)
   normList$fresco50 <- preprocessFresco(normList, loessSpan = .5, sdThreshold = .15)
   normList$fresco85 <- preprocessFresco(object, loessSpan = .85, sdThreshold = .15)
   normList$frescoNL <- preprocessFresco(object, fitLoess = FALSE, sdThreshold = .15)
   normList$quantile <- preprocessQuantile(mapToGenome(object))
-  normList$funnorm <- preprocessFunnorm(object)
+  normList$funnorm  <- preprocessFunnorm(object)
 
   # test for batch effects ---------------------------------------------
   if (!is.null(batchVarName)){
