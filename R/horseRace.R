@@ -2,8 +2,8 @@
 horseRace <- function(object, batchVarName = NULL, 
                       covariateNames = NULL, covariateTypes = NULL){
   
-  if (!is(object, "RGchannelSet"))
-    stop("object needs to be a 'RGchannelSet'")
+  if (!is(object, "RGChannelSet"))
+    stop("object needs to be a 'RGChannelSet'")
   
   if (is.null(batchVarName) & is.null(covariateNames))
     stop("Please provide variable name for either batch or covariates of interest")
