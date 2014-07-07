@@ -14,4 +14,6 @@ Depends:
     stats,
     matrixStats,
     methods,
-    minfi
+    minfi,
+    IlluminaHumanMethylation450kmanifest
+    
