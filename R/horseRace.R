@@ -59,7 +59,7 @@ horseRace <- function(object, batchVarName = NULL,
     # plot
     plot(0, 0, xlim = c(0, 1), ylim = c(0, 1),
          xlab = 'FDR Threshold', ylab = 'Prop sig at given FDR',
-         main = paste('Power for', covariateNames[iii]))
+         main = paste('Power for', covariateNames[ii]))
     abline(0, 1, lty = 3)
     
     for(ii in 1:length(roc.results))
