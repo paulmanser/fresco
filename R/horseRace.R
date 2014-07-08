@@ -27,7 +27,7 @@ horseRace <- function(object, batchVarName = NULL,
 
   # test for batch effects ---------------------------------------------
   if (!is.null(batchVarName)){
-    f.results <- lapply(normList, .batchTest)
+    f.results <- lapply(normList, .batchTest, bvn=batchVarName)
     roc.results <- lapply(f.results, function(x) .rocComp(na.omit(x[, 2])))
   }
   
@@ -47,12 +47,12 @@ horseRace <- function(object, batchVarName = NULL,
     for(ii in 1:length(covariateNames)){
       
       if (is(covariateNames[ii], 'categorical')){
-        f.results <- lapply(normList, .catTest)
+        f.results <- lapply(normList, .catTest, cvn=covariateNames[ii])
         roc.results <- lapply(f.results, function(x) .rocComp(na.omit(x[, 2]), BH.adj = TRUE))
       }
       
       if (is(covariateNames[ii], 'continuous')){
-        f.results <- lapply(normList, .contTest)
+        f.results <- lapply(normList, .contTest, cvn=covariateNames[ii])
         roc.results <- lapply(f.results, function(X) .rocComp(na.omit(x[, 2]), BH.adj = TRUE))
       }
       
@@ -76,10 +76,10 @@ horseRace <- function(object, batchVarName = NULL,
   sapply(eval, function(z) sum(x < z) / length(x))
 }
 
-.batchTest <- function(x) rowFtests(getBeta(x), factor(pData(x)[, batchVarName]))
-.catTest <- function(x) rowFtests(getBeta(x), factor(pData(x)[, factor(covariateNames[ii])]))
-.contTest <- function(x){
-  cont.cov <- pData(x)[, covariateNames[ii]]
+.batchTest <- function(x, bvn) rowFtests(getBeta(x), factor(pData(x)[, bvn]))
+.catTest <- function(x, cvn) rowFtests(getBeta(x), factor(pData(x)[, factor(cvn)]))
+.contTest <- function(x, cvn){
+  cont.cov <- pData(x)[, cvn]
   apply(getBeta(x), 1, function(z) biglm(z ~ cont.cov))
 }
 
