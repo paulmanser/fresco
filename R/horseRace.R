@@ -27,12 +27,12 @@ horseRace <- function(object, batchVarName = NULL,
 
   # test for batch effects ---------------------------------------------
   if (!is.null(batchVarName)){
-    f.results <- lapply(normList, .batchTest, bvn=batchVarName)
+    f.results <- lapply(normList, .catTest, cvn=batchVarName)
     roc.results <- lapply(f.results, function(x) .rocComp(na.omit(x[, 2])))
   }
   
   # p-value ecdf
-  plot(0, 0, xlim = c(0, 1), ylim = c(0, 1),
+  plot(0, 0, xlim = c(0, 1), ylim = c(0, 1), type='n',
        xlab = 'P-value', ylab = 'ECDF',
        main = 'P-value ECDF for Batch Effects')
   abline(0, 1, lty = 3)
@@ -46,18 +46,18 @@ horseRace <- function(object, batchVarName = NULL,
   if (!is.null(covariateNames)){
     for(ii in 1:length(covariateNames)){
       
-      if (is(covariateNames[ii], 'categorical')){
+      if (covariateTypes[ii] == 'categorical'){
         f.results <- lapply(normList, .catTest, cvn=covariateNames[ii])
         roc.results <- lapply(f.results, function(x) .rocComp(na.omit(x[, 2]), BH.adj = TRUE))
       }
       
-      if (is(covariateNames[ii], 'continuous')){
+      if (covariateTypes[ii] == 'continuous'){
         f.results <- lapply(normList, .contTest, cvn=covariateNames[ii])
         roc.results <- lapply(f.results, function(X) .rocComp(na.omit(x[, 2]), BH.adj = TRUE))
       }
       
     # plot
-    plot(0, 0, xlim = c(0, 1), ylim = c(0, 1),
+    plot(0, 0, xlim = c(0, 1), ylim = c(0, 1), type='n',
          xlab = 'FDR Threshold', ylab = 'Prop sig at given FDR',
          main = paste('Power for', covariateNames[ii]))
     abline(0, 1, lty = 3)
@@ -76,10 +76,9 @@ horseRace <- function(object, batchVarName = NULL,
   sapply(eval, function(z) sum(x < z) / length(x))
 }
 
-.batchTest <- function(x, bvn) rowFtests(getBeta(x), factor(pData(x)[, bvn]))
 .catTest <- function(x, cvn) rowFtests(getBeta(x), factor(pData(x)[, cvn]))
 .contTest <- function(x, cvn){
-  cont.cov <- pData(x)[, cvn]
+  cont.cov <- as.numeric(pData(x)[, cvn])
   apply(getBeta(x), 1, function(z) biglm(z ~ cont.cov))
 }
 
