@@ -17,7 +17,4 @@ Mark Reimers \email{mreimers@vcu.edu}
 
 Maintainer: Paul Manser \email{manserpt@vcu.edu}
 }
-\references{
-Chen,Y. et al. (2013) Discovery of cross-reactive probes and polymorphic CpGs in the Illumina Infinium HumanMethylation450 microarray. Epigenetics, 8, 203–9.
-}
 
