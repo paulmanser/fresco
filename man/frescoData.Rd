@@ -29,13 +29,7 @@ well as that cross-hybridize to probes on sex chromosomes obtained from Chen et 
 frescoData is called from within the fresco functions, but a separate copy can be
 loaded into the global environment if desired.
 }
-\source{
-Chen, Y., Lemire, M., Choufani, S., Butcher, D. T., Grafodatskaya, D., Zanke, B. W., … Weksberg, R. (2013). Discovery of cross-reactive probes and polymorphic CpGs in the Illumina Infinium HumanMethylation450 microarray. Epigenetics: official journal of the DNA Methylation Society, 8(2), 203–9. doi:10.4161/epi.23470
 
-}
-\references{
-
-}
 \examples{
 }
 \keyword{datasets}
