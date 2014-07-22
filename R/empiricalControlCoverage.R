@@ -21,10 +21,10 @@ empiricalControlCoverage <- function(object, sdThreshold = .15){
   frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
   GC <- frescoData$targetGC
   
-  log2Centered <- apply(log2(signals + 1), c(1, 3), mean, trim = .1)
+  log2Centered <- apply(log2(signals + 1), c(1, 3), mean)
   
   # filter controls and create indicator variables --------------------------
-  probeSD <- apply(getBeta(object), 1, sd)
+  probeSD <- rowSds(getBeta(object))
   frescoData$eControls[probeSD > sdThreshold] <- NA
   typeI <- which(frescoData$probeType == 'I')
   typeII <- which(frescoData$probeType == 'II')
@@ -132,12 +132,4 @@ empiricalControlCoverage <- function(object, sdThreshold = .15){
          pch = 16, cex = controlCex, col = 'yellow')
   
 }
-  
-  
-  
-  
-  
-  
-  
-  
-  
+    
