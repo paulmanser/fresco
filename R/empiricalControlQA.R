@@ -29,7 +29,7 @@ empiricalControlQA <- function(object, sdThreshold = .15){
         means[order(means)], col = 1)
   
   # plot control probe standard deviations --------------------------------------
-  controlsSD <- rowSds(betaVals[controlInd[order(means)]])
+  controlsSD <- rowSds(betaVals[controlInd[order(means)], ])
   
   plot(density(controlsSD), 
        main = 'Empirical Control Probe Standard Deviations',
