@@ -36,8 +36,8 @@ empiricalControlQA <- function(object, sdThreshold = .15){
        xlab='Standard Deviation')
     
   abline(v = sdThreshold)
-  legend('right', legend = paste(sum(controlsSD < sdThreshold), 'of', 
-                                 length(controlInd), 'controls remaining'), bty = 'n')
+  cat(paste(sum(controlsSD < sdThreshold), 'of', 
+            length(controlInd), 'controls remaining'))
   
   image(betaVals[controlInd[order(means)], ][which(controlsSD < sdThreshold), ], 
         axes = FALSE,
