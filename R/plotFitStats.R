@@ -13,8 +13,6 @@ plotFitStats <- function(object, useControls = TRUE,
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   
-  data(frescoData)
-  
   fitstats <- list()
   
   # generate fit statistics -------------------------------------------------
