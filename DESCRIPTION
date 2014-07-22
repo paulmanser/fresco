@@ -12,6 +12,7 @@ License: MIT
 Depends:
     R (>= 3.0.1),
     stats,
+    dplyr,
     matrixStats,
     methods,
     minfi,
