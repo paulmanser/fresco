@@ -10,20 +10,21 @@ returnFitStats <-function(object, useControls = TRUE, loessSpan = .15,
   
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
   
+  data(frescoData)
+  object <- fixMethOutliers(object)
+  
   # create object for methylated and unmethylated channels -------------------------
-  methTmp <- getMeth(object)
-  probeIDs <- rownames(methTmp)
-  signals <- array(dim = c(dim(methTmp), 2))
+  signals <- array(dim = c(dim(object), 2))
   signals[, , 1] <- getUnmeth(object)
-  signals[, , 2] <- methTmp
-  frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
+  signals[, , 2] <- getMeth(object)
+  frescoData <- frescoData[match(rownames(object), rownames(frescoData)), ]
   GC <- frescoData$targetGC
   
   # get set of empirical controls --------------------------------------------------
   if (useControls){
-    probeSD <- apply(getBeta(object), 1, sd)
+    probeSD <- rowSds(getBeta(object))
     controls <- which(!is.na(frescoData$eControls) & probeSD < sdThreshold)
-    if (verbose) cat(length(controls), 'empirical control probes detected\n')
+    if (verbose) cat(length(controls), 'empirical control probes selected\n')
   } 
   
   # divide probes and controls up by probe type ------------------------------------
@@ -53,8 +54,8 @@ returnFitStats <-function(object, useControls = TRUE, loessSpan = .15,
   
   # scale signals to minimize deviance from control averages -----------------------
   if (verbose) cat('Applying linear scaling factor \n')
-  typeIcontrolAvg <- apply(signals[whichControlsI, , ], c(1, 3), mean, trim = .1)
-  typeIIcontrolAvg <- apply(signals[whichControlsII, , ], c(1, 3), mean, trim = .1)
+  typeIcontrolAvg <- apply(signals[whichControlsI, , ], c(1, 3), mean)
+  typeIIcontrolAvg <- apply(signals[whichControlsII, , ], c(1, 3), mean)
   
   coefsI1 <- lm(signals[whichControlsI, , 1] ~ typeIcontrolAvg[, 1] + 0)$coef
   coefsI2 <- lm(signals[whichControlsI, , 2] ~ typeIcontrolAvg[, 2] + 0)$coef
@@ -71,6 +72,7 @@ returnFitStats <-function(object, useControls = TRUE, loessSpan = .15,
   # compute robust experiment average ---------------------------------------------
   if (verbose) cat('Computing robust experiment-wise average\n')
   log2Centered <- log2(scaledSignals + 1)  
+  
   sexInd <- factor(suppressWarnings(getSex(mapToGenome(object))[, 3]))
   XYind <- which(frescoData$chromosome %in% c('X', 'Y'))
   log2Standard <- apply(log2Centered, c(1, 3), mean, trim = .1)
@@ -139,37 +141,31 @@ returnFitStats <-function(object, useControls = TRUE, loessSpan = .15,
   
   if (nlevels(sexInd) == 2){
     if (verbose) cat('Normalizing type I probes \n')
+    typeInormed <- typeIInormed <- array(dim = c(3, dim(log2Deviations)[2], 2))
     # type I
-    typeInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoessSS,
-                          indepVars = indepVarsM, whichControls = whichControlsI, 
-                          whichSet = whichSetI, smoothingParameter = loessSpan)
+    typeInormed[, mInd, ] <- apply(log2Deviations[, mInd, ], c(2, 3), funLoessSS,
+                                   indepVars = indepVarsM, whichControls = whichControlsI, 
+                                   whichSet = whichSetI, smoothingParameter = loessSpan)
     
-    typeInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoessSS, 
-                          indepVars = indepVarsF, whichControls = whichControlsI, 
-                          whichSet = whichSetI, smoothingParameter = loessSpan)
+    typeInormed[, fInd, ] <- apply(log2Deviations[, fInd, ], c(2, 3), funLoessSS, 
+                                   indepVars = indepVarsF, whichControls = whichControlsI, 
+                                   whichSet = whichSetI, smoothingParameter = loessSpan)
     
     # type II
     if (verbose) cat('Normalizing type II probes \n')
-    typeIInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoessSS, 
-                           indepVars = indepVarsM, whichControls = whichControlsII, 
-                           whichSet = whichSetII, smoothingParameter = loessSpan)
+    typeIInormed[, mInd, ] <- apply(log2Deviations[, mInd, ], c(2, 3), funLoessSS, 
+                                    indepVars = indepVarsM, whichControls = whichControlsII, 
+                                    whichSet = whichSetII, smoothingParameter = loessSpan)
     
-    typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoessSS, 
-                           indepVars = indepVarsF, whichControls = whichControlsII, 
-                           whichSet = whichSetII, smoothingParameter = loessSpan)
-    
-    typeInormed <- typeIInormed <- array(dim = c(3, dim(log2Deviations)[2], 2))
-    typeInormed[, mInd, ] <- typeInormedM
-    typeInormed[, fInd, ] <- typeInormedF
-    typeIInormed[, mInd, ] <- typeIInormedM
-    typeIInormed[, fInd, ] <- typeIInormedF
-    
+    typeIInormed[, fInd, ] <- apply(log2Deviations[, fInd, ], c(2, 3), funLoessSS, 
+                                    indepVars = indepVarsF, whichControls = whichControlsII, 
+                                    whichSet = whichSetII, smoothingParameter = loessSpan)
+        
     estimatedErrorVar <- list(typeInormed, typeIInormed)
     return(estimatedErrorVar)
   }
   
 }
-
 
 # declare loess function 
 funLoessSS <- function(y, indepVars, whichControls, whichSet, smoothingParameter) {
