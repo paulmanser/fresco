@@ -21,7 +21,7 @@ filterCpGs <- function(object, removeChromosomes = NULL, filterCrossHyb = TRUE,
   
   populationAF <- c('All', 'African', 'American', 'Asian', 'European')
   if (!population %in% populationAF){
-    stop("population' must be one of 'All', 'African', 'American', 'Asian', or 'European'")
+    stop("population' must be one of: 'All', 'African', 'American', 'Asian', or 'European'")
   }
   
   if (sum(!removeChromosomes %in% c('X', 'Y', 1:22)) > 0){
