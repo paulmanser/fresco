@@ -20,19 +20,17 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   object <- fixMethOutliers(object)
   
   # create object for methylated and unmethylated channels -------------------------
-  methTmp <- getMeth(object)
-  probeIDs <- rownames(methTmp)
-  signals <- array(dim = c(dim(methTmp), 2))
+  signals <- array(dim = c(dim(object), 2))
   signals[, , 1] <- getUnmeth(object)
-  signals[, , 2] <- methTmp
-  frescoData <- frescoData[match(probeIDs, rownames(frescoData)), ]
+  signals[, , 2] <- getMeth(object)
+  frescoData <- frescoData[match(rownames(object), rownames(frescoData)), ]
   GC <- frescoData$targetGC
   
   # get set of empirical controls --------------------------------------------------
   if (useControls){
-    probeSD <- apply(getBeta(object), 1, sd)
+    probeSD <- rowSds(getBeta(object))
     controls <- which(!is.na(frescoData$eControls) & probeSD < sdThreshold)
-    if (verbose) cat(length(controls), 'empirical control probes detected\n')
+    if (verbose) cat(length(controls), 'empirical control probes selected\n')
   } 
   
   # divide probes and controls up by probe type ------------------------------------
@@ -82,8 +80,8 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
     out <- object
     normedUnmeth <- scaledSignals[, , 1]
     normedMeth <- scaledSignals[, , 2]
-    rownames(normedUnmeth) <- rownames(normedMeth) <- probeIDs
-    colnames(normedUnmeth) <- colnames(normedMeth) <- colnames(methTmp)
+    rownames(normedUnmeth) <- rownames(normedMeth) <- rownames(object)
+    colnames(normedUnmeth) <- colnames(normedMeth) <- colnames(object)
     
     assayDataElement(out, 'Unmeth') <- normedUnmeth
     assayDataElement(out, 'Meth') <- normedMeth
@@ -152,70 +150,64 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   if (verbose) cat('Fitting & subtracting out loess\n')
   
   if (nlevels(sexInd) == 1){
+    log2NormedDevs <- array(dim = dim(log2Deviations))
+    
     if (verbose) cat('Normalizing type I probes \n')
-    typeInormed <- apply(log2Deviations, c(2, 3), funLoess, 
-                         indepVars = indepVars, whichControls = whichControlsI,
-                         whichSet = whichSetI, smoothingParameter = loessSpan)
+    log2NormedDevs[whichSetI, , ] <- apply(log2Deviations, c(2, 3), funLoess, 
+                                           indepVars = indepVars, whichControls = whichControlsI,
+                                           whichSet = whichSetI, smoothingParameter = loessSpan)
     
     if (verbose) cat('Normalizing type II probes \n')
-    typeIInormed <- apply(log2Deviations, c(2, 3), funLoess, 
-                          indepVars = indepVars, whichControls = whichControlsII, 
-                          whichSet = whichSetII, smoothingParameter = loessSpan)
-    
-    # recombine into log2NormedDevs
-    log2NormedDevs <- array(dim = dim(log2Deviations))
-    log2NormedDevs[whichSetI, , ] <- typeInormed
-    log2NormedDevs[whichSetII, , ] <- typeIInormed  
+    log2NormedDevs[whichSetII, , ] <- apply(log2Deviations, c(2, 3), funLoess, 
+                                            indepVars = indepVars, whichControls = whichControlsII, 
+                                            whichSet = whichSetII, smoothingParameter = loessSpan)
   }
   
   if (nlevels(sexInd) == 2){
+    log2NormedDevs <- array(dim = dim(log2Deviations))
+    
     if (verbose) cat('Normalizing type I probes \n')
     # type I
-    typeInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess,
-                          indepVars = indepVarsM, whichControls = whichControlsI, 
-                          whichSet = whichSetI, smoothingParameter = loessSpan)
+    log2NormedDevs[whichSetI, mInd, ] <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess,
+                                               indepVars = indepVarsM, whichControls = whichControlsI, 
+                                               whichSet = whichSetI, smoothingParameter = loessSpan)
     
-    typeInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
-                          indepVars = indepVarsF, whichControls = whichControlsI, 
-                          whichSet = whichSetI, smoothingParameter = loessSpan)
+    log2NormedDevs[whichSetI, fInd, ] <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
+                                               indepVars = indepVarsF, whichControls = whichControlsI, 
+                                               whichSet = whichSetI, smoothingParameter = loessSpan)
     
     # type II
     if (verbose) cat('Normalizing type II probes \n')
-    typeIInormedM <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess, 
-                           indepVars = indepVarsM, whichControls = whichControlsII, 
-                           whichSet = whichSetII, smoothingParameter = loessSpan)
+    log2NormedDevs[whichSetII, mInd, ] <- apply(log2Deviations[, mInd, ], c(2, 3), funLoess, 
+                                                indepVars = indepVarsM, whichControls = whichControlsII, 
+                                                whichSet = whichSetII, smoothingParameter = loessSpan)
     
-    typeIInormedF <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
-                           indepVars = indepVarsF, whichControls = whichControlsII, 
-                           whichSet = whichSetII, smoothingParameter = loessSpan)
-    
-    # recombine into log2NormedDevs
-    log2NormedDevs <- array(dim = dim(log2Deviations))
-    log2NormedDevs[whichSetI, mInd, ] <- typeInormedM
-    log2NormedDevs[whichSetII, mInd, ] <- typeIInormedM
-    log2NormedDevs[whichSetI, fInd, ] <- typeInormedF
-    log2NormedDevs[whichSetII, fInd, ] <- typeIInormedF
+    log2NormedDevs[whichSetII, fInd, ] <- apply(log2Deviations[, fInd, ], c(2, 3), funLoess, 
+                                                indepVars = indepVarsF, whichControls = whichControlsII, 
+                                                whichSet = whichSetII, smoothingParameter = loessSpan)
     
   }
   
   # compute normalized log2 signals --------------------------------------------------
   log2NormedSignals <- array(dim = dim(log2Centered))  
-  if (nlevels(sexInd) == 1)
+  if (nlevels(sexInd) == 1){
     for (kk in 1:2) log2NormedSignals[, , kk] <- log2NormedDevs[, , kk] + log2Standard[, kk]
-  
+    rm(log2NormedDevs, log2Standard); gc()
+  }
   if (nlevels(sexInd) == 2){
     for(kk in 1:2){
       log2NormedSignals[, mInd, kk] <- log2NormedDevs[, mInd, kk] + log2StandardM[, kk]
       log2NormedSignals[, fInd, kk] <- log2NormedDevs[, fInd, kk] + log2StandardF[, kk]
     }
+    rm(log2NormedDevs, log2StandardM, log2StandardF); gc()
   }
   
   # create new MethylSet for output ------------------------------------------------
   out <- object
   normedUnmeth <- 2^log2NormedSignals[, , 1]
   normedMeth <- 2^log2NormedSignals[, , 2]
-  rownames(normedUnmeth) <- rownames(normedMeth) <- probeIDs
-  colnames(normedUnmeth) <- colnames(normedMeth) <- colnames(methTmp)
+  rownames(normedUnmeth) <- rownames(normedMeth) <- rownames(object)
+  colnames(normedUnmeth) <- colnames(normedMeth) <- colnames(object)
   
   assayDataElement(out, 'Unmeth') <- normedUnmeth
   assayDataElement(out, 'Meth') <- normedMeth
