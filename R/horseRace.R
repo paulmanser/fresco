@@ -18,12 +18,13 @@ horseRace <- function(object, batchVarName = NULL,
   # normalize ---------------------------------------------------------
   normList <- list()
   normList$rawMSet  <- preprocessIllumina(updateObject(object))
-  normList$fresco15 <- preprocessFresco(normList$rawMSet, loessSpan = .15, sdThreshold = .15)
-  normList$fresco50 <- preprocessFresco(normList$rawMSet, loessSpan = .5, sdThreshold = .15)
-  normList$fresco85 <- preprocessFresco(normList$rawMSet, loessSpan = .85, sdThreshold = .15)
-  normList$frescoNL <- preprocessFresco(normList$rawMSet, fitLoess = FALSE, sdThreshold = .15)
+  normList$fresco15 <- preprocessFresco(normList$rawMSet, loessSpan = .15, sdThreshold = .1)
+  normList$fresco50 <- preprocessFresco(normList$rawMSet, loessSpan = .5, sdThreshold = .1)
+  normList$fresco85 <- preprocessFresco(normList$rawMSet, loessSpan = .85, sdThreshold = .1)
+  normList$frescoNL <- preprocessFresco(normList$rawMSet, fitLoess = FALSE, sdThreshold = .1)
   normList$quantile <- preprocessQuantile(mapToGenome(object))
   normList$funnorm  <- preprocessFunnorm(object)
+  normList$noob     <- preprocessNoob(object)
 
   # test for batch effects ---------------------------------------------
   if (!is.null(batchVarName)){
