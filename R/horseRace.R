@@ -111,7 +111,8 @@ horseRace <- function(object, batchVarName = NULL,
         for(jj in c(1, 5:7)){
           plot( -log10(p.vals[[jj]][, 1]), -log10(p.vals[[jj]][, 2]),
                pch=16, cex=.7, col=rgb(0,0,1,alpha=.4),
-               xlab = 'Original F-Statistic', ylab = 'Normalized SSE')
+               xlab = 'Original F-Statistic', ylab = 'Normalized SSE',
+               main=names(p.vals)[jj])
           abline(0,1,col='red')
           
           plot( -log10(p.vals[[jj]][, 1]),  -log10(p.vals[[jj]][, 3]),
