@@ -83,8 +83,8 @@ horseRace <- function(object, batchVarName = NULL,
         n <- ncol(normList[[1]])
         
         # re-order f-results because mapToGenome re-orders the CpGs
-        for(ii in 2:length(f.results)){
-          f.results[[ii]] <- f.results[[ii]][match(rownames(normList[[1]]), rownames(normList[[ii]])) ,]
+        for(jj in 2:length(f.results)){
+          f.results[[jj]] <- f.results[[jj]][match(rownames(normList[[1]]), rownames(normList[[jj]])) ,]
         }
         
         p.vals <- list()        
