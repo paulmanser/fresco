@@ -102,7 +102,8 @@ horseRace <- function(object, batchVarName = NULL,
         names(p.vals) <- names(normList)[-1]
         
         # plot
-        axis.lims <- max(-log10(unlist(unlist(p.vals))        ))
+        axis.lims <- -log10(unlist(p.vals))
+        axis.lims <- max(axis.lims[which(is.finite(axis.lims))])
         
         par(mfcol = c(2, 4), mar=c(3, 4, 4, 1.5))
 
