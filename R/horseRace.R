@@ -104,20 +104,20 @@ horseRace <- function(object, batchVarName = NULL,
         # plot
         axis.lims <- max(-log10(unlist(unlist(p.vals))        ))
         
-        par(mfcol = c(2, 4))
+        par(mfcol = c(2, 4), mar=c(3, 4, 4, 1.5))
 
 #         orig.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,1], method='BH') < .001),1]))
 #         ssr.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,2], method='BH') < .001), 2]))
 #         sse.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,3], method='BH') < .001), 3]))
         for(jj in c(1, 5:7)){
           plot( -log10(p.vals[[jj]][, 1]), -log10(p.vals[[jj]][, 2]),
-               pch=16, cex=.7, col=rgb(0,0,1,alpha=.4),
+               pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
                xlab = 'Original F-Statistic', ylab = 'Normalized SSE',
                main=names(p.vals)[jj], xlim=c(0, axis.lims), ylim=c(0, axis.lims))
           abline(0,1,col='red')
           
           plot( -log10(p.vals[[jj]][, 1]),  -log10(p.vals[[jj]][, 3]),
-               pch=16, cex=.7, col=rgb(0,0,1,alpha=.4),
+               pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
                xlab = 'Original F-Statistic', ylab = 'Normalized SSR',
                xlim=c(0, axis.lims), ylim=c(0, axis.lims))
           abline(0,1,col='red')
