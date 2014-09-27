@@ -102,6 +102,7 @@ horseRace <- function(object, batchVarName = NULL,
         names(p.vals) <- names(normList)[-1]
         
         # plot
+        axis.lims <- max(-log10(unlist(unlist(p.vals))        ))
         
         par(mfcol = c(2, 4))
 
@@ -112,12 +113,13 @@ horseRace <- function(object, batchVarName = NULL,
           plot( -log10(p.vals[[jj]][, 1]), -log10(p.vals[[jj]][, 2]),
                pch=16, cex=.7, col=rgb(0,0,1,alpha=.4),
                xlab = 'Original F-Statistic', ylab = 'Normalized SSE',
-               main=names(p.vals)[jj])
+               main=names(p.vals)[jj], xlim=c(0, axis.lims), ylim=c(0, axis.lims))
           abline(0,1,col='red')
           
           plot( -log10(p.vals[[jj]][, 1]),  -log10(p.vals[[jj]][, 3]),
                pch=16, cex=.7, col=rgb(0,0,1,alpha=.4),
-               xlab = 'Original F-Statistic', ylab = 'Normalized SSR')
+               xlab = 'Original F-Statistic', ylab = 'Normalized SSR',
+               xlim=c(0, axis.lims), ylim=c(0, axis.lims))
           abline(0,1,col='red')
           
         }
