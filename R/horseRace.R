@@ -105,7 +105,7 @@ horseRace <- function(object, batchVarName = NULL,
         axis.lims <- -log10(unlist(p.vals))
         axis.lims <- max(axis.lims[which(is.finite(axis.lims))])
         
-        par(mfcol = c(2, 4), mar=c(3, 4, 4, 1.5))
+        par(mfcol = c(2, 5), mar=c(3, 4, 4, 1.5))
 
 #         orig.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,1], method='BH') < .001),1]))
 #         ssr.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,2], method='BH') < .001), 2]))
