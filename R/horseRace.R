@@ -31,17 +31,17 @@ horseRace <- function(object, batchVarName = NULL,
   if (!is.null(batchVarName)){
     f.results <- lapply(normList, .catTest, cvn=batchVarName)
     roc.results <- lapply(f.results, function(x) .rocComp(na.omit(x[, 2])))
+    
+    # p-value ecdf
+    plot(0, 0, xlim = c(0, 1), ylim = c(0, 1), type='n',
+         xlab = 'P-value', ylab = 'ECDF',
+         main = 'P-value ECDF for Batch Effects')
+    abline(0, 1, lty = 3)
+    
+    for(ii in 1:length(roc.results))
+      lines(seq(0, 1, .01), roc.results[[ii]], col = ii)
+    legend('bottomright', legend = names(roc.results), fill = 1:length(roc.results))
   }
-  
-  # p-value ecdf
-  plot(0, 0, xlim = c(0, 1), ylim = c(0, 1), type='n',
-       xlab = 'P-value', ylab = 'ECDF',
-       main = 'P-value ECDF for Batch Effects')
-  abline(0, 1, lty = 3)
-  
-  for(ii in 1:length(roc.results))
-    lines(seq(0, 1, .01), roc.results[[ii]], col = ii)
-  legend('bottomright', legend = names(roc.results), fill = 1:length(roc.results))
   
   # look at power for covariates of interest --------------------------------
   
