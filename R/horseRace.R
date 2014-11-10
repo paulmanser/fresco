@@ -18,14 +18,14 @@ horseRace <- function(object, batchVarName = NULL,
   
   # normalize ---------------------------------------------------------
   normList <- list()
-  normList$rawMSet  <- preprocessIllumina(updateObject(object))
-  normList$fresco15 <- preprocessFresco(normList$rawMSet, loessSpan = .15, sdThreshold = .1)
-  normList$fresco50 <- preprocessFresco(normList$rawMSet, loessSpan = .5, sdThreshold = .1)
-  normList$fresco85 <- preprocessFresco(normList$rawMSet, loessSpan = .85, sdThreshold = .1)
-  normList$frescoNL <- preprocessFresco(normList$rawMSet, fitLoess = FALSE, sdThreshold = .1)
-  normList$quantile <- preprocessQuantile(mapToGenome(object))
-  normList$funnorm  <- preprocessFunnorm(object)
-  normList$noob     <- preprocessNoob(object)
+  normList$Raw       <- preprocessIllumina(updateObject(object))
+  normList$FRESCO_15 <- preprocessFresco(normList$rawMSet, loessSpan = .15, sdThreshold = .1)
+  normList$FRESCO_50 <- preprocessFresco(normList$rawMSet, loessSpan = .5, sdThreshold = .1)
+  normList$FRESCO_85 <- preprocessFresco(normList$rawMSet, loessSpan = .85, sdThreshold = .1)
+  normList$FRESCO_NL <- preprocessFresco(normList$rawMSet, fitLoess = FALSE, sdThreshold = .1)
+  normList$SQN       <- preprocessQuantile(mapToGenome(object))
+  normList$Funnorm   <- preprocessFunnorm(object)
+  normList$Noob      <- preprocessNoob(object)
 
   # test for batch effects ---------------------------------------------
   if (!is.null(batchVarName)){
@@ -61,7 +61,7 @@ horseRace <- function(object, batchVarName = NULL,
       # plot
       plot(0, 0, xlim = c(0, 1), ylim = c(0, 1), type='n',
            xlab = 'FDR Threshold', ylab = 'Prop sig at given FDR',
-           main = paste('Power for', covariateNames[ii]))
+           main = paste('Significant Differences for', covariateNames[ii]))
       abline(0, 1, lty = 3)
       
       for(ii in 1:length(roc.results))
@@ -105,7 +105,7 @@ horseRace <- function(object, batchVarName = NULL,
         axis.lims <- -log10(unlist(p.vals))
         axis.lims <- max(axis.lims[which(is.finite(axis.lims))])
         
-        par(mfcol = c(2, 5), mar=c(3, 4, 4, 1.5))
+        par(mfcol = c(2, 5), mar=c(5, 4, 4, 1.5))
 
 #         orig.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,1], method='BH') < .001),1]))
 #         ssr.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,2], method='BH') < .001), 2]))
@@ -113,14 +113,16 @@ horseRace <- function(object, batchVarName = NULL,
         for(jj in c(1, 4:7)){
           plot( -log10(p.vals[[jj]][, 1]), -log10(p.vals[[jj]][, 2]),
                pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
-               xlab = 'Original F-Statistic', ylab = 'Normalized SSE',
-               main=names(p.vals)[jj], xlim=c(0, axis.lims), ylim=c(0, axis.lims))
+               xlab = 'Original F Statistic', ylab = expression('F'['Err']),
+               main=names(p.vals)[jj], xlim=c(0, axis.lims), ylim=c(0, axis.lims),
+               cex.axis = 1.7, cex.lab = 1.7)
           abline(0,1,col='red')
           
           plot( -log10(p.vals[[jj]][, 1]),  -log10(p.vals[[jj]][, 3]),
                pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
-               xlab = 'Original F-Statistic', ylab = 'Normalized SSR',
-               xlim=c(0, axis.lims), ylim=c(0, axis.lims))
+               xlab = 'Original F Statistic', ylab = expression('F'['ES']),
+               xlim=c(0, axis.lims), ylim=c(0, axis.lims),
+               cex.axis = 1.7, cex.lab = 1.7)
           abline(0,1,col='red')
           
         }
