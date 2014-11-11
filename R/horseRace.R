@@ -105,24 +105,21 @@ horseRace <- function(object, batchVarName = NULL,
         axis.lims <- -log10(unlist(p.vals))
         axis.lims <- max(axis.lims[which(is.finite(axis.lims))])
         
-        par(mfcol = c(2, 5), mar=c(5, 4, 4, 1.5))
+        par(mfcol = c(2, 5), mar=c(5, 5, 5, 3))
 
-#         orig.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,1], method='BH') < .001),1]))
-#         ssr.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,2], method='BH') < .001), 2]))
-#         sse.fdr <- -log10(max(p.vals[[jj]][which(p.adjust(p.vals[[jj]][,3], method='BH') < .001), 3]))
         for(jj in c(1, 4:7)){
           plot( -log10(p.vals[[jj]][, 1]), -log10(p.vals[[jj]][, 2]),
                pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
                xlab = 'Original F Statistic', ylab = expression('F'['Err']),
                main=names(p.vals)[jj], xlim=c(0, axis.lims), ylim=c(0, axis.lims),
-               cex.axis = 1.7, cex.lab = 1.7)
+               cex.axis = 1.7, cex.lab = 1.7, cex.main=1.7)
           abline(0,1,col='red')
           
           plot( -log10(p.vals[[jj]][, 1]),  -log10(p.vals[[jj]][, 3]),
                pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
                xlab = 'Original F Statistic', ylab = expression('F'['ES']),
                xlim=c(0, axis.lims), ylim=c(0, axis.lims),
-               cex.axis = 1.7, cex.lab = 1.7)
+               cex.axis = 1.7, cex.lab = 1.7, cex.main=1.7)
           abline(0,1,col='red')
           
         }
@@ -169,13 +166,4 @@ horseRace <- function(object, batchVarName = NULL,
   out <- cbind(ssr, sse)
   out
 }
-
-
-# .contCompF <- function(x)
-
-
-
-
-
-
 
