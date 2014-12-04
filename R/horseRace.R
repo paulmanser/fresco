@@ -110,14 +110,16 @@ horseRace <- function(object, batchVarName = NULL,
         for(jj in c(1, 4:7)){
           plot( -log10(p.vals[[jj]][, 1]), -log10(p.vals[[jj]][, 2]),
                pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
-               xlab = 'Original F Statistic', ylab = expression('F'['Err']),
+               xlab = expression("-log"[10]*'(Original F-stat P-values)'), 
+               ylab = expression("-log"[10]*'(F'['Err']*' P-values)'),
                main=names(p.vals)[jj], xlim=c(0, axis.lims), ylim=c(0, axis.lims),
                cex.axis = 1.7, cex.lab = 1.7, cex.main=1.7)
           abline(0,1,col='red')
           
           plot( -log10(p.vals[[jj]][, 1]),  -log10(p.vals[[jj]][, 3]),
                pch=16, cex=.2, col=rgb(0,0,1,alpha=.4),
-               xlab = 'Original F Statistic', ylab = expression('F'['ES']),
+               xlab = expression("-log"[10]*'(Original F-stat P-values)'), 
+               ylab = expression("-log"[10]*'(F'['ES']*' P-values)'),
                xlim=c(0, axis.lims), ylim=c(0, axis.lims),
                cex.axis = 1.7, cex.lab = 1.7, cex.main=1.7)
           abline(0,1,col='red')
