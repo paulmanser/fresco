@@ -15,12 +15,14 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
-  
-  if(is.null(customControls)){
+
+  if (is.null(customControls)){
+    if (verbose) cat('Using empirical controls suggested by fresco \n')
     data(frescoData)
   }
   
-  if(!is.null(customControls)){
+  if (!is.null(customControls)){
+    if (verbose) cat('Using provided set of custom empirical controls \n')
     frescoData <- customControls
   }
   
