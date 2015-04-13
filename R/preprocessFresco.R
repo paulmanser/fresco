@@ -11,11 +11,14 @@
 
 preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15, 
                             fitLoess = TRUE, sdThreshold = .15, verbose = TRUE,
-                            customControls = NULL){  
+                            customControls = NULL, returnResiduals = FALSE){  
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
 
+  if (returnResiduals)
+    cat('Returning local regression residuals instead of beta values \n')
+  
   if (is.null(customControls)){
     if (verbose) cat('Using empirical controls suggested by fresco \n')
     data(frescoData)
@@ -196,6 +199,28 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
                                                 whichSet = whichSetII, smoothingParameter = loessSpan)
     
   }
+  
+  if (returnResiduals){
+    resids <- list()
+    
+    resids$M.devs <- log2Deviations[, , 2]
+    resids$M.mean <- log2Standard[, 2]
+    resids$M.resids <- log2NormedDevs[, , 2]
+    
+    resids$UM.devs <- log2Deviations[, , 1]
+    resids$UM.mean <- log2Standard[, 1]
+    resids$UM.resids <- log2NormedDevs[, , 1]
+    
+    rownames(resids$M.devs) <- names(resids$M.mean) <- rownames(resids$M.resids) <-
+      rownames(resids$UM.devs) <- names(resids$UM.mean) <- rownames(resids$UM.resids) <- rownames(object)
+    
+    
+    resids$pheno <- pData(object)
+    
+    return(resids)
+  }
+  
+  
   
   # compute normalized log2 signals --------------------------------------------------
   log2NormedSignals <- array(dim = dim(log2Centered))  
