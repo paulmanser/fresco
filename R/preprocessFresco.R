@@ -11,7 +11,7 @@
 
 preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15, 
                             fitLoess = TRUE, sdThreshold = .15, verbose = TRUE,
-                            customControls = NULL, returnResiduals = FALSE){  
+                            customControls = NULL, returnResiduals = FALSE, referenceSamples = NULL){  
   
   if (!is(object, "MethylSet")) stop("'object' needs to be a 'MethylSet'")
   if (loessSpan > 1 | loessSpan < 0) stop("loessSpan must be between zero and one")
@@ -29,6 +29,10 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
     frescoData <- customControls
   }
   
+  if (!is.null(referenceSamples)){
+    if (verbose) cat('Using provided subset of samples as reference for normalization \n')
+  }
+  
   object <- fixMethOutliers(object)
   
   # create object for methylated and unmethylated channels -------------------------
@@ -40,7 +44,11 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   
   # get set of empirical controls --------------------------------------------------
   if (useControls){
-    probeSD <- rowSds(getBeta(object))
+    if(!is.null(referenceSamples)){
+      probeSD <- rowSds(getBeta(object[, referenceSamples]))
+    }else{
+      probeSD <- rowSds(getBeta(object))
+    }
     controls <- which(!is.na(frescoData$eControls) & probeSD < sdThreshold)
     if (verbose) cat(length(controls), 'empirical control probes selected\n')
   } 
@@ -63,6 +71,10 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   typeIIpeaks <- apply(signals[whichControlsII, , ], c(2, 3), getLowerPeak)
   typeIpeakMeans <- colMeans(typeIpeaks)
   typeIIpeakMeans <- colMeans(typeIIpeaks)
+  if (!is.null(referenceSamples)){
+    typeIpeakMeans <- colMeans(typeIpeaks[referenceSamples, ])
+    typeIIpeakMeans <- colMeans(typeIIpeaks[referenceSamples, ])
+  }
   
   # line up samples by their lower peaks -------------------------------------------
   signals[whichSetI, , 1] <- sweep(signals[whichSetI, , 1], 2, typeIpeaks[, 1], '-')
@@ -72,8 +84,13 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   
   # scale signals to minimize deviance from control averages -----------------------
   if (verbose) cat('Applying linear scaling factor \n')
-  typeIcontrolAvg <- apply(signals[whichControlsI, , ], c(1, 3), mean)
-  typeIIcontrolAvg <- apply(signals[whichControlsII, , ], c(1, 3), mean)
+  if (!is.null(referenceSamples)){
+    typeIcontrolAvg <- apply(signals[whichControlsI, referenceSamples, ], c(1, 3), mean)
+    typeIIcontrolAvg <- apply(signals[whichControlsII, referenceSamples, ], c(1, 3), mean)
+  }else{
+    typeIcontrolAvg <- apply(signals[whichControlsI, , ], c(1, 3), mean)
+    typeIIcontrolAvg <- apply(signals[whichControlsII, , ], c(1, 3), mean)
+  }
   
   coefsI1 <- lm(signals[whichControlsI, , 1] ~ typeIcontrolAvg[, 1] + 0)$coef
   coefsI2 <- lm(signals[whichControlsI, , 2] ~ typeIcontrolAvg[, 2] + 0)$coef
@@ -112,15 +129,31 @@ preprocessFresco <-function(object, useControls = TRUE, loessSpan = .15,
   
   sexInd <- factor(suppressWarnings(getSex(mapToGenome(object))[, 3]))
   XYind <- which(frescoData$chromosome %in% c('X', 'Y'))
-  log2Standard <- apply(log2Centered, c(1, 3), mean, trim = .1)
   
+  if(!is.null(referenceSamples)){
+    log2Standard <- apply(log2Centered[, referenceSamples, ], c(1, 3), mean, trim = .1)
+  }else{
+    log2Standard <- apply(log2Centered, c(1, 3), mean, trim = .1)
+  }
+
   if (nlevels(sexInd) == 2){
-    mInd <- which(sexInd == 'M')
-    fInd <- which(sexInd == 'F')
-    
-    log2StandardM <- log2StandardF <- log2Standard
-    log2StandardM[XYind, ] <- apply(log2Centered[XYind, mInd, ], c(1, 3), mean, trim = .1)
-    log2StandardF[XYind, ] <- apply(log2Centered[XYind, fInd, ], c(1, 3), mean, trim = .1)
+    if(!is.null(referenceSamples)){
+      
+      mInd <- intersect( which(sexInd == 'M'), referenceSamples)
+      fInd <- intersect( which(sexInd == 'F'), referenceSamples)
+      
+      log2StandardM <- log2StandardF <- log2Standard
+      log2StandardM[XYind, ] <- apply(log2Centered[XYind, mInd, ], c(1, 3), mean, trim = .1)
+      log2StandardF[XYind, ] <- apply(log2Centered[XYind, fInd, ], c(1, 3), mean, trim = .1)      
+      
+    }else{
+      mInd <- which(sexInd == 'M')
+      fInd <- which(sexInd == 'F')
+      
+      log2StandardM <- log2StandardF <- log2Standard
+      log2StandardM[XYind, ] <- apply(log2Centered[XYind, mInd, ], c(1, 3), mean, trim = .1)
+      log2StandardF[XYind, ] <- apply(log2Centered[XYind, fInd, ], c(1, 3), mean, trim = .1)
+    }
   }
   
   # compute deviations from average -----------------------------------------  
